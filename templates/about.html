@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>140mi - About</title>
+        <link href="static/about.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <ul>
+            <li class="logo" >
+              <a href="/"><img src="{{ url_for('static', filename='140mi-logo.png') }}"  alt="140 logo" height="80px"></a>
+            </li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/search">Search</a></li>
+            {% if session['email'] %}
+            <li><a href="">Favorites</a></li>
+            <li><a href="">Account</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Register</a></li>
+            {% endif %}
+
+          </ul>
+          
+        <div class="content">
+            <h1>About the <strong>140mi</strong> project</h1>
+            <div class="section">
+                <h2>About me</h2>
+                <p>
+                  I'm a computer science student at the George Washington University with a deep fascination for space and the unknown.
+                  Space has been very captivated; its vastness, and how much of it remains unexplored
+                  and unexplained. When the Artemis II launched recently, that curiosity turned into something
+                  more urgent. Watching humanity prepare to return to the Moon for the first time in more than 50 years
+                  made the field feel not just fascinating, but so exciting<br>
+                  I'm pursuing a B.S. in Computer Science, with coursework spanning software engineering, databases,
+                  systems programming, linear algebra, and physics.
+                </p>
+              </div>
+              <div class="section">
+                <h2>Skills I'm applying for this project</h2>
+                <div class="skills-grid">
+                  <div class="skill-card"><p class="name">Flask & Python</p><p class="desc">Backend routing and API integration</p></div>
+                  <div class="skill-card"><p class="name">Database design</p><p class="desc">Relational schemas for telemetry data</p></div>
+                  <div class="skill-card"><p class="name">REST APIs</p><p class="desc">Consuming NASA's open data endpoints</p></div>
+                  <div class="skill-card"><p class="name">HTML & CSS</p><p class="desc">Frontend layout and styling</p></div>
+                </div>
+              </div>
+              <div class="section">
+                <h2>Contact</h2>
+                <div class="skills-grid">
+                    <a href="https://www.linkedin.com/in/ahnlauriehenry/"><div class="skill-card"><p class="name" >LinkedIn</p></div></a>
+                    <a href="https://ahnhenry.github.io/"><div class="skill-card"><p class="name">Portfolio</p></div></a>
+                  <div class="skill-card"><p class="name">Email</p></div>
+                  
+                </div>
+              </div>
+        </div>
+        
+    </body>
+</html>

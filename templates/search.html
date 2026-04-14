@@ -1,0 +1,79 @@
+c<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>140mi - Search</title>
+        <link href="static/main.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <ul>
+            <li class="logo">
+                <a href="/"><img src="{{ url_for('static', filename='140mi-logo.png') }}"  alt="140 logo" height="80px"></a>
+            </li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/search">Search</a></li>
+            {% if session['email'] %} 
+            <li><a href="">Favorites</a></li>
+            <li><a href="/account">Account</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Register</a></li>
+            {% endif %} 
+
+          </ul>
+          
+          <div class="content">
+            <form action="/search">
+              <div class="input-box">
+                <label for="query">Search</label>
+                <input type="text" name="query" id="query" 
+                       value="{{ query }}" placeholder="e.g. curiosity rover, mars landscape" />
+              </div>
+              <button type="submit" name="submit">Search</button>
+            </form>
+          
+            <div class="results">
+                <div class="photo-grid">
+                  {% for photo in photos %}
+                  <form action="/search">
+                    <div class="photo-card" onclick="openLightbox('{{ photo.img_src }}', '{{ photo.title }}')" >
+                      <img src="{{ photo.img_src }}" alt="{{ photo.title }}" />
+                      <p>{{ photo.title }} · {{ photo.date }}</p>
+                      <button type="submit" name="favorites">Add to Favorites</button>
+                    </div>
+                  </form>
+                  {% endfor %}
+                </div>
+              
+                {% if query and photos|length == 0 %}
+                  <p style="color: #888; text-align: center; padding-top: 40px;">
+                    No photos found for "{{ query }}".
+                  </p>
+                {% endif %}
+              </div>          
+            </div>
+
+        <p>{{ error }}</p>
+
+        <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+            <div class="lightbox-inner">
+              <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('open')">&#x2715;</button>
+              <img id="lightbox-img" src="" alt="" />
+              <p class="lightbox-title" id="lightbox-title"></p>
+            </div>
+          </div>
+    </body>
+    <script>
+        function openLightbox(src, title) {
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox-title').textContent = title;
+        document.getElementById('lightbox').classList.add('open');
+        }
+
+        function closeLightbox(e) {
+        if (e.target === document.getElementById('lightbox')) {
+            document.getElementById('lightbox').classList.remove('open');
+        }
+        }
+    </script>
+</html>

@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+}
+ul {
+    display: flex;
+    align-items: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 20px;
+
+  }
+  
+ul li {
+    font-size: larger;
+}
+ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+ul li a:hover {
+   text-decoration: underline;
+}
+
+li.logo {
+    margin-right: auto;  
+  }
+  
+li.logo img  {
+    height: 80px; 
+    object-fit: contain;
+}
+
+.content .pic {
+    display: flex;
+    margin: auto;
+    width: 50%;
+    border-radius: 30px;
+}
+
+.content {
+    align-items: center;
+    margin: auto;
+    padding-top: 2%;
+    padding-bottom: 5%;
+
+}
+.text {
+    width: 40%;
+    margin: auto;
+}
+
+.content h2 {
+    color: white;
+    text-align: center;
+}
+
+.content p{
+    color: white;
+    text-align: center;
+}
