@@ -170,12 +170,6 @@ Both APIs are free and publicly available. No payment or special access is requi
 
 ---
 
-## Contributing
-
-This is a personal project but feedback and suggestions are welcome. Feel free to open an issue or submit a pull request.
-
----
-
 ## License
 
 This project is open source. All NASA imagery is in the public domain per [NASA's media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/).
