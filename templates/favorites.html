@@ -1,7 +1,7 @@
 c<!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>140mi - Search</title>
+        <title>140mi - Saved</title>
         <link href="static/main.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
@@ -12,7 +12,7 @@ c<!DOCTYPE html>
             <li><a href="/about">About</a></li>
             <li><a href="/search">Search</a></li>
             {% if session['email'] %} 
-            <li><a href="/favorites">Saved</a></li>
+            <li><a href="/favoritese">Saved</a></li>
             <li><a href="/account">Account</a></li>
             <li><a href="/logout">Logout</a></li>
             {% else %}
@@ -23,44 +23,17 @@ c<!DOCTYPE html>
           </ul>
           
           <div class="content">
-            <form action="/search">
-              <div class="input-box">
-                <label for="query">Search</label>
-                <input type="text" name="query" id="query" 
-                       value="{{ query }}" placeholder="e.g. curiosity rover, mars landscape" />
-              </div>
-              <button type="submit" name="submit">Search</button>
-            </form>
-          
+            <h2 style="color: white;">Saved Images</h2>
             <div class="results">
               <div class="photo-grid">
                 {% for photo in photos %}
-                <div class="photo-card" onclick="openLightbox('{{ photo.img_src }}', '{{ photo.title }}')">
-                  <img src="{{ photo.img_src }}" alt="{{ photo.title }}" />
+                <div class="photo-card" onclick="openLightbox( '{{ photo.src }}', '{{ photo.title }}')">
+                  <img src=" {{ photo.src }} " alt="{{ photo.title }}" />
                   <p>{{ photo.title }} · {{ photo.date }}</p>
-                  {% if session['email'] %}
-                    {% if photo.img_src in saved_srcs %}
-                    <div style="margin: 0 8px 8px;">
-                      <button type="submit" disabled>Saved</button>
-                    </div>
-                    {% else %}
-                      <form action="/save" method="POST">
-                        <input type="hidden" name="img_src" value="{{ photo.img_src }}" />
-                        <input type="hidden" name="title" value="{{ photo.title }}" />
-                        <input type="hidden" name="date" value="{{ photo.date }}" />
-                        <button type="submit">Add to Favorites</button>
-                      </form>
-                    {% endif %}
-                  {% endif %}
                 </div>
                 {% endfor %}
               </div>
-              
-                {% if query and photos|length == 0 %}
-                  <p style="color: #888; text-align: center; padding-top: 40px;">
-                    No photos found for "{{ query }}".
-                  </p>
-                {% endif %}
+==
               </div>          
             </div>
 

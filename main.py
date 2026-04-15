@@ -76,9 +76,17 @@ def login():
 @app.route('/search')
 def search():
     query = request.args.get('query', '')
-    
     photos = []
     error = ''
+    saved_srcs = set()
+
+    if session.get('email'):
+        connection = sqlite3.connect("database.db")
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        cursor.execute("SELECT src FROM favorites WHERE email=?", (session.get('email'),))
+        saved_srcs = set(row['src'] for row in cursor.fetchall())
+        connection.close()
 
     if query:
         try:
@@ -103,7 +111,7 @@ def search():
             error = "Could not fetch photos. Try again."
             print(f"API error: {e}")
 
-    return render_template('search.html', photos=photos, error=error, query=query)
+    return render_template('search.html', photos=photos, error=error, query=query, saved_srcs=saved_srcs)
 
 @app.route('/about')
 def about():
@@ -111,20 +119,41 @@ def about():
 
 @app.route('/account')
 def account():
-    if not session['email']:
+    if not session.get('email'):
         return redirect(url_for('index'))
     
     connection = sqlite3.connect("database.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM user WHERE email=?", (session['email'],))
+    cursor.execute("SELECT * FROM user WHERE email=?", (session.get('email'),))
     data = cursor.fetchone()
 
     return render_template("account.html", data=data)
+@app.route('/pass')
+def password():
+    return render_template('change_password.html')
 
-@app.route('/change_pass')
+@app.route('/change_pass', methods = ['POST', 'GET'])
 def change_pass():
+    connection = sqlite3.connect("database.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    email = session.get('email')
+    if request.method == 'POST':
+        oldpass = request.form['oldpass']
+        newpass = request.form['newpass']
+        newpass2 = request.form['newpass2']
+    cursor.execute("SELECT password FROM user WHERE email=?", (email,))
+    password = cursor.fetchone()
+    if oldpass != password['password']:
+        return render_template("change_password.html", error="Wrong password. Please enter correct current password.")
+    if newpass != newpass2:
+        return render_template("change_password.html", error="Passwords do not match.")
+    
+    cursor.execute("UPDATE user SET password=? WHERE email=?", (newpass, email))
+    connection.commit()
+    connection.close()
     return render_template("change_password.html")
 
 @app.route('/email')
@@ -136,7 +165,7 @@ def change_email():
     connection = sqlite3.connect("database.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    email = session['email']
+    email = session.get('email')
     if request.method == 'POST':
         new_email = request.form['new_email']
         password = request.form['pass']
@@ -159,6 +188,39 @@ def change_email():
     connection.close()
 
     return redirect(url_for('account'))
+
+@app.route('/save', methods = ['POST', 'GET'])
+def save():
+    if not session.get('email'):
+        return redirect(url_for('login'))
+    
+    connection = sqlite3.connect("database.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    email = session.get('email')
+
+    if request.method == 'POST':
+        src = request.form['img_src']
+        title = request.form['title']
+        date = request.form['date']
+
+    cursor.execute("INSERT INTO favorites (email, src, title, date) VALUES (?, ?, ?, ?)", (email, src, title, date)) 
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for('search'))
+
+@app.route('/favorites')
+def favorites():
+    if session.get('email'):
+        connection = sqlite3.connect("database.db")
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        cursor.execute("SELECT src, title, date FROM favorites WHERE email=?", (session.get('email'),))
+        photos = cursor.fetchall()
+
+    return render_template("favorites.html", photos=photos)
 
 @app.route('/logout')
 def logout():
