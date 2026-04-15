@@ -145,12 +145,17 @@ Both APIs are free and publicly available. No payment or special access is requi
 ├── api.env.example      # Template showing what api.env should look like
 ├── .gitignore           # Files excluded from version control
 ├── static/
+    ├── about.css        # Styles for the about page
 │   ├── index.css        # Styles for the home page
-│   ├── rovers.css       # Styles for the rovers/search page
+│   ├── search.css       # Styles for the search page
 │   └── 140mi-logo.png   # Site logo
 └── templates/
+    ├── change_email.css # Changing email page
+    ├── change_password.css # Changing password page
+    ├── favorites.css    # Display user's saved images
+    ├── account.css      # Account page
     ├── index.html       # Home page
-    ├── rovers.html      # Search and photo grid page
+    ├── search.html      # Search and photo grid page
     ├── login.html       # Login page
     ├── signup.html      # Registration page
     └── about.html       # About page
