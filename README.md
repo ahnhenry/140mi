@@ -158,7 +158,7 @@ Both APIs are free and publicly available. No payment or special access is requi
 
 ---
 
-## Tech Stack
+## Full Stack
 
 | Layer | Technology |
 |-------|-----------|
