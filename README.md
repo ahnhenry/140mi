@@ -8,7 +8,7 @@
 
 ## Features
 
-- **Search NASA's image library** — search thousands of real NASA photos by keyword (e.g. "curiosity rover", "Mars landscape", "Artemis")
+- **Search NASA's image library** — search thousands of real NASA photos by keyword (e.g. "curiosity rover", "Artemis")
 - **Photo grid** — results displayed in a clean, responsive grid
 - **Lightbox viewer** — click any photo to view it full size
 - **User accounts** — register, log in, and log out
@@ -100,8 +100,9 @@ http://localhost:8080
 
 1. **Search** — type any space-related keyword into the search bar on the Rovers page and hit Search. Try "mars surface", "perseverance", or "apollo".
 2. **Browse** — scroll through the photo grid to explore results.
-3. **View full size** — click any photo to open it in a lightbox overlay. Click anywhere outside the photo or the X button to close it.
-4. **Register / Log in** — create an account using the Register link in the navigation bar.
+3. **Save** - add to favorites, the pictures you treasure the most.
+4. **View full size** — click any photo to open it in a lightbox overlay. Click anywhere outside the photo or the X button to close it.
+5. **Register / Log in** — create an account using the Register link in the navigation bar.
 
 ---
 
