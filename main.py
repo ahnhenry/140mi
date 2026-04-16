@@ -4,15 +4,23 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 import sqlite3
-import random
+import anthropic
+import markdown
+
 app = Flask('140mi')
 app.secret_key = "140"
 app.debug = True
 DATABASE = 'database.db'
 
 load_dotenv("api.env")
+
+client = anthropic.Anthropic(
+    api_key=os.getenv("CLAUDE_API"),
+)
+
 NASA_API_KEY = os.getenv("NASA_API_KEY")
 print(f"API KEY LOADED: {NASA_API_KEY}")
+
 
 @app.route('/')
 def index():
@@ -71,7 +79,49 @@ def login():
     
     return render_template('login.html')
 
+@app.route('/chat')
+def chat():
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+    return render_template('chat.html', history=session['chat_history'])
 
+@app.route('/chat/send', methods=['POST'])
+def chat_send():
+    user_message = request.form.get('message', '').strip()
+    if not user_message:
+        return redirect(url_for('chat'))
+
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+
+    history = session['chat_history']
+    messages = []
+    for entry in history:
+        messages.append({"role": "user", "content": entry['user']})
+        messages.append({"role": "assistant", "content": entry['assistant']})
+    messages.append({"role": "user", "content": user_message})
+
+    try:
+        response = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=1024,
+            system="You are AstroBot, a friendly space expert...",
+            messages=messages
+        )
+        assistant_reply = markdown.markdown(response.content[0].text)
+    except Exception as e:
+        assistant_reply = f"⚠️ Sorry, I couldn't respond right now. (Error: {str(e)})"
+
+    history.append({'user': user_message, 'assistant': assistant_reply})
+    session['chat_history'] = history
+    session.modified = True
+
+    return redirect(url_for('chat'))
+
+@app.route('/chat/clear')
+def chat_clear():
+    session.pop('chat_history', None)
+    return redirect(url_for('chat'))
 
 @app.route('/search')
 def search():

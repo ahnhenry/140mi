@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>140mi - Search</title>
+        <link href="static/chat.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <ul>
+            <li class="logo">
+                <a href="/"><img src="{{ url_for('static', filename='140mi-logo.png') }}"  alt="140 logo" height="80px"></a>
+            </li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/search">Search</a></li>
+            {% if session['email'] %} 
+            <li><a href="/favorites">Saved</a></li>
+            <li><a href="/account">Account</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Register</a></li>
+            {% endif %} 
+
+        </ul>
+
+        <div class="content">
+            <h2>🚀 AstroBot — Ask me anything about space!</h2>
+
+            <div class="chat-box">
+                {% if not history %}
+                    <p style="color: white;">Ask me about planets, NASA missions, black holes, and more!</p>
+                {% endif %}
+                {% for entry in history %}
+                    <div style="margin-bottom: 12px;">
+                        <div style="color: white;"><strong>You:</strong> {{ entry.user }}</div>
+                        <div style="color: goldenrod; margin-top: 4px;"><strong>AstroBot:</strong> {{ entry.assistant | safe }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+                <form action="/chat/send" method="POST">
+                    <div class="input-box">
+                        <input type="text" name="message" placeholder="Ask a space question...">
+                        <button type="submit" >Send</button>
+                    </div>
+                </form>
+                <a href="/chat/clear"><button type="submit">Clear Conversation</button></a>
+            </div>
+        </div>
+    </body>
+    <script>
+        // Auto-scroll to bottom of chat
+        const box = document.querySelector('.chat-box');
+        box.scrollTop = box.scrollHeight;
+      </script>
+</html>
