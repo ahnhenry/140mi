@@ -8,7 +8,7 @@
 
 ## Features
 
-- **Search NASA's image library** — search thousands of real NASA photos by keyword (e.g. "curiosity rover", "Mars landscape", "Artemis")
+- **Search NASA's image library** — search thousands of real NASA photos by keyword (e.g. "curiosity rover", "Artemis")
 - **Photo grid** — results displayed in a clean, responsive grid
 - **Lightbox viewer** — click any photo to view it full size
 - **User accounts** — register, log in, and log out
@@ -100,8 +100,9 @@ http://localhost:8080
 
 1. **Search** — type any space-related keyword into the search bar on the Rovers page and hit Search. Try "mars surface", "perseverance", or "apollo".
 2. **Browse** — scroll through the photo grid to explore results.
-3. **View full size** — click any photo to open it in a lightbox overlay. Click anywhere outside the photo or the X button to close it.
-4. **Register / Log in** — create an account using the Register link in the navigation bar.
+3. **Save** - add to favorites, the pictures you treasure the most.
+4. **View full size** — click any photo to open it in a lightbox overlay. Click anywhere outside the photo or the X button to close it.
+5. **Register / Log in** — create an account using the Register link in the navigation bar.
 
 ---
 
@@ -145,12 +146,17 @@ Both APIs are free and publicly available. No payment or special access is requi
 ├── api.env.example      # Template showing what api.env should look like
 ├── .gitignore           # Files excluded from version control
 ├── static/
+    ├── about.css        # Styles for the about page
 │   ├── index.css        # Styles for the home page
-│   ├── rovers.css       # Styles for the rovers/search page
+│   ├── search.css       # Styles for the search page
 │   └── 140mi-logo.png   # Site logo
 └── templates/
+    ├── change_email.css # Changing email page
+    ├── change_password.css # Changing password page
+    ├── favorites.css    # Display user's saved images
+    ├── account.css      # Account page
     ├── index.html       # Home page
-    ├── rovers.html      # Search and photo grid page
+    ├── search.html      # Search and photo grid page
     ├── login.html       # Login page
     ├── signup.html      # Registration page
     └── about.html       # About page
@@ -158,7 +164,7 @@ Both APIs are free and publicly available. No payment or special access is requi
 
 ---
 
-## Tech Stack
+## Full Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -167,12 +173,6 @@ Both APIs are free and publicly available. No payment or special access is requi
 | Frontend | HTML, CSS, JavaScript |
 | API | NASA Image and Video Library, NASA APOD |
 | Auth | Flask sessions |
-
----
-
-## Contributing
-
-This is a personal project but feedback and suggestions are welcome. Feel free to open an issue or submit a pull request.
 
 ---
 
