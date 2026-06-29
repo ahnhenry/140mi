@@ -10,7 +10,7 @@ import sqlite3
 
 app = Flask('140mi')
 app.secret_key = "140"
-app.debug = True
+app.debug = False
 DATABASE = 'database.db'
 hp = PasswordHasher()
 load_dotenv("api.env")
