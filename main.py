@@ -9,13 +9,11 @@ import sqlite3
 
 
 app = Flask('140mi')
-app.secret_key = "140"
 app.debug = False
 DATABASE = 'database.db'
 hp = PasswordHasher()
 load_dotenv("api.env")
-
-
+app.secret_key = os.getenv("SECRET_KEY")
 NASA_API_KEY = os.getenv("NASA_API_KEY")
 
 
