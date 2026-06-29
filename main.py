@@ -2,7 +2,7 @@ import requests
 from flask import Flask, session, render_template, redirect, url_for, request
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, InvalidHashError
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
 import sqlite3
@@ -17,10 +17,36 @@ app.secret_key = os.getenv("SECRET_KEY")
 NASA_API_KEY = os.getenv("NASA_API_KEY")
 
 
+apod_cache = {"data": None, "fetched_at": None}
+
+def get_apod():
+    now = datetime.utcnow()
+    # Return cached data if it's less than 1 hour old
+    if apod_cache["data"] and apod_cache["fetched_at"]:
+        age = now - apod_cache["fetched_at"]
+        if age < timedelta(hours=1):
+            return apod_cache["data"]
+    
+    try:
+        res = requests.get(
+            "https://api.nasa.gov/planetary/apod",
+            params={"api_key": NASA_API_KEY},
+            timeout=10
+        )
+        res.raise_for_status()
+        apod_cache["data"] = res.json()
+        apod_cache["fetched_at"] = now
+    except Exception as e:
+        print(f"APOD fetch failed: {e}")
+        # Fall back to stale cache if available, otherwise None
+        if not apod_cache["data"]:
+            apod_cache["data"] = None
+
+    return apod_cache["data"]
+
 @app.route('/')
 def index():
-    res = requests.get("https://api.nasa.gov/planetary/apod", params={"api_key": NASA_API_KEY})
-    apod = res.json()
+    apod = get_apod()
     return render_template('index.html', apod=apod)
 
 @app.route('/signup', methods = ['GET', 'POST'])
