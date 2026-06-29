@@ -1,25 +1,22 @@
 import requests
 from flask import Flask, session, render_template, redirect, url_for, request
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError, InvalidHashError
 from datetime import datetime
 from dotenv import load_dotenv
 import os
 import sqlite3
-import anthropic
-import markdown
+
 
 app = Flask('140mi')
 app.secret_key = "140"
 app.debug = True
 DATABASE = 'database.db'
-
+hp = PasswordHasher()
 load_dotenv("api.env")
 
-client = anthropic.Anthropic(
-    api_key=os.getenv("CLAUDE_API"),
-)
 
 NASA_API_KEY = os.getenv("NASA_API_KEY")
-print(f"API KEY LOADED: {NASA_API_KEY}")
 
 
 @app.route('/')
@@ -47,7 +44,8 @@ def signup():
         if password != con_pass:
             return render_template('signup.html', error='Passwords do not match')
 
-        cursor.execute("INSERT INTO user (email, password, fname, lname) VALUES (?, ?, ?, ?)", (email, password, fname, lname))
+        hashed = hp.hash(password)
+        cursor.execute("INSERT INTO user (email, password, fname, lname) VALUES (?, ?, ?, ?)", (email, hashed, fname, lname))
         connection.commit()
         connection.close()
         session['email'] = email
@@ -69,59 +67,64 @@ def login():
         data = cursor.fetchone()
         if data is None:
             return render_template('login.html', error='Email not associated with an account.')
-        if data['password'] != password:
-            return render_template('login.html', error='Wrong Password')
+        else:
+            try:
+                hp.verify(data['password'], password)
+                session['email'] = data['email']
+                return redirect(url_for('index'))
+            except VerifyMismatchError:
+                return render_template('login.html', error='Email or password are incorrect.')
+            except InvalidHashError:
+                hashed = hp.hash(password)
+                cursor.execute("UPDATE user SET password=? WHERE email=?", (hashed, email))
+                connection.commit()
+                return redirect(url_for('index'))
         
-
-        connection.close()
-        session['email'] = email
-        return redirect(url_for('index'))
-    
     return render_template('login.html')
 
-@app.route('/chat')
-def chat():
-    if 'chat_history' not in session:
-        session['chat_history'] = []
-    return render_template('chat.html', history=session['chat_history'])
+# @app.route('/chat')
+# def chat():
+#     if 'chat_history' not in session:
+#         session['chat_history'] = []
+#     return render_template('chat.html', history=session['chat_history'])
 
-@app.route('/chat/send', methods=['POST'])
-def chat_send():
-    user_message = request.form.get('message', '').strip()
-    if not user_message:
-        return redirect(url_for('chat'))
+# @app.route('/chat/send', methods=['POST'])
+# def chat_send():
+#     user_message = request.form.get('message', '').strip()
+#     if not user_message:
+#         return redirect(url_for('chat'))
 
-    if 'chat_history' not in session:
-        session['chat_history'] = []
+#     if 'chat_history' not in session:
+#         session['chat_history'] = []
 
-    history = session['chat_history']
-    messages = []
-    for entry in history:
-        messages.append({"role": "user", "content": entry['user']})
-        messages.append({"role": "assistant", "content": entry['assistant']})
-    messages.append({"role": "user", "content": user_message})
+#     history = session['chat_history']
+#     messages = []
+#     for entry in history:
+#         messages.append({"role": "user", "content": entry['user']})
+#         messages.append({"role": "assistant", "content": entry['assistant']})
+#     messages.append({"role": "user", "content": user_message})
 
-    try:
-        response = client.messages.create(
-            model="claude-opus-4-5",
-            max_tokens=1024,
-            system="You are AstroBot, a friendly space expert...",
-            messages=messages
-        )
-        assistant_reply = markdown.markdown(response.content[0].text)
-    except Exception as e:
-        assistant_reply = f"⚠️ Sorry, I couldn't respond right now. (Error: {str(e)})"
+#     try:
+#         response = client.messages.create(
+#             model="claude-opus-4-5",
+#             max_tokens=1024,
+#             system="You are AstroBot, a friendly space expert...",
+#             messages=messages
+#         )
+#         assistant_reply = markdown.markdown(response.content[0].text)
+#     except Exception as e:
+#         assistant_reply = f"⚠️ Sorry, I couldn't respond right now. (Error: {str(e)})"
 
-    history.append({'user': user_message, 'assistant': assistant_reply})
-    session['chat_history'] = history
-    session.modified = True
+#     history.append({'user': user_message, 'assistant': assistant_reply})
+#     session['chat_history'] = history
+#     session.modified = True
 
-    return redirect(url_for('chat'))
+#     return redirect(url_for('chat'))
 
-@app.route('/chat/clear')
-def chat_clear():
-    session.pop('chat_history', None)
-    return redirect(url_for('chat'))
+# @app.route('/chat/clear')
+# def chat_clear():
+#     session.pop('chat_history', None)
+#     return redirect(url_for('chat'))
 
 @app.route('/search')
 def search():
@@ -196,8 +199,10 @@ def change_pass():
         newpass2 = request.form['newpass2']
     cursor.execute("SELECT password FROM user WHERE email=?", (email,))
     password = cursor.fetchone()
-    if oldpass != password['password']:
-        return render_template("change_password.html", error="Wrong password. Please enter correct current password.")
+    try:
+        hp.verify(password, oldpass)
+    except VerifyMismatchError:
+        return render_template("change_password.html", error="Passwords incorrect.")
     if newpass != newpass2:
         return render_template("change_password.html", error="Passwords do not match.")
     
@@ -223,9 +228,11 @@ def change_email():
     cursor.execute("SELECT password FROM user WHERE email=?", (email,))
     pass2 = cursor.fetchone()
 
-    if pass2['password'] != password:
+    try:
+        hp.verify(pass2, password)
+    except VerifyMismatchError:
         return render_template("change_email.html", error="Wrong password. Please enter correct password.")
-
+    
     cursor.execute("SELECT email from user where email=?", (new_email,))
     users = cursor.fetchall()
     if users:
